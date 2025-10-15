@@ -1,11 +1,11 @@
-# Exit if Minikube not installed
+# Check if Minikube is installed
 if (-not (Get-Command minikube -ErrorAction SilentlyContinue)) { exit 1 }
 
-# Start Minikube
-minikube start --driver=docker
+# Start Minikube quietly
+minikube start --driver=docker --wait=all --quiet
 
-# Verify cluster
+# Verify cluster is running
 kubectl cluster-info
 
-# List pods
-kubectl get pods
+# List all pods
+kubectl get pods --all-namespaces
