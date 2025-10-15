@@ -1,12 +1,17 @@
-# kurbeScript.ps1
+# Check if Minikube is installed
+if (-not (Get-Command minikube -ErrorAction SilentlyContinue)) {
+    Write-Host "Minikube is not installed. Please install it first."
+    exit 1
+}
 
+# Start Minikube
 Write-Host "Starting Minikube..."
 minikube start --driver=docker
 
-Write-Host "`nCluster info:"
+# Verify the cluster is running
+Write-Host "Verifying cluster..."
 kubectl cluster-info
 
-Write-Host "`nListing all pods in all namespaces:"
-kubectl get pods --all-namespaces
-
-Write-Host "`nDone!"
+# List available pods
+Write-Host "Listing pods..."
+kubectl get pods
