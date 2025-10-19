@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: django-app-blue
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: django-app-blue
@@ -13,7 +13,8 @@ spec:
         app: django-app-blue
     spec:
       containers:
-      - name: django-app
-        image: meron695/django-messaging-app:latest
+      - name: django-container
+        image: meron695/django-messaging-app:2.0   # updated version
         ports:
         - containerPort: 8000
+
