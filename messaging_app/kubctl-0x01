@@ -1,0 +1,14 @@
+#!/bin/bash
+# kubctl-0x01: Scale Django app, check pods, monitor resources
+
+# Step 1: Scale the Django deployment to 3 replicas
+kubectl scale deployment django-app --replicas=3
+
+# Step 2: Verify pods are running
+kubectl get pods
+
+# Step 3: Optional load testing (checker handles this if needed)
+# wrk -t2 -c100 -d30s http://<service-ip-or-url>
+
+# Step 4: Monitor resource usage
+kubectl top pods
