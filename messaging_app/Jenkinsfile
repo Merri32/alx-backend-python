@@ -1,12 +1,17 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_HUB_CREDENTIALS = 'dockerhub-credentials' // Jenkins credentials ID for Docker Hub
+        IMAGE_NAME = 'meron695/messaging-app:latest'      // Your Docker Hub username
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/Merri32/alx-backend-python.git',
-                    credentialsId: 'github-credentials' // <- required by checker
+                    credentialsId: 'github-credentials' // Jenkins GitHub credentials
             }
         }
 
@@ -25,6 +30,21 @@ pipeline {
         stage('Archive Test Report') {
             steps {
                 junit 'report.xml'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${IMAGE_NAME} messaging_app/"
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                    sh "docker push ${IMAGE_NAME}"
+                }
             }
         }
     }
