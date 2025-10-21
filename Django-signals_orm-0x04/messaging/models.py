@@ -22,11 +22,16 @@ class Message(models.Model):
 
     def get_thread(self):
         """
-        Recursively fetches all replies to this message in a threaded format.
-        Uses prefetch_related to optimize database queries.
+        Recursively fetch all replies to this message in a threaded format,
+        using select_related and prefetch_related to optimize queries.
         """
-        # Prefetch replies efficiently
-        replies = self.replies.prefetch_related('replies').select_related('sender', 'receiver')
+        # Prefetch replies and their senders/receivers efficiently
+        replies = self.replies.select_related('sender', 'receiver').prefetch_related(
+            'replies__sender',
+            'replies__receiver',
+            'replies__replies'
+        )
+
         thread = []
         for reply in replies:
             thread.append({
