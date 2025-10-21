@@ -32,16 +32,12 @@ class Message(models.Model):
         return f"Message from {self.sender} to {self.receiver}"
 
     def get_thread(self):
-        """
-        Recursively fetch all replies to this message in a threaded format,
-        using select_related and prefetch_related to optimize queries.
-        """
+        """Recursively fetch all replies to this message in a threaded format."""
         replies = self.replies.select_related('sender', 'receiver').prefetch_related(
             'replies__sender',
             'replies__receiver',
             'replies__replies'
         )
-
         thread = []
         for reply in replies:
             thread.append({
@@ -68,3 +64,4 @@ class MessageHistory(models.Model):
 
     def __str__(self):
         return f"History of Message {self.message.id} at {self.edited_at}"
+
