@@ -8,10 +8,32 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    edited = models.BooleanField(default=False)  # ✅ Track if message has been edited
+    edited = models.BooleanField(default=False)  # Track if message has been edited
+    parent_message = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        related_name='replies',
+        on_delete=models.CASCADE
+    )  # Self-referential FK for threaded replies
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver}"
+
+    def get_thread(self):
+        """
+        Recursively fetches all replies to this message in a threaded format.
+        Uses prefetch_related to optimize database queries.
+        """
+        # Prefetch replies efficiently
+        replies = self.replies.prefetch_related('replies').select_related('sender', 'receiver')
+        thread = []
+        for reply in replies:
+            thread.append({
+                'message': reply,
+                'replies': reply.get_thread()  # Recursive call for nested replies
+            })
+        return thread
 
 
 class Notification(models.Model):
